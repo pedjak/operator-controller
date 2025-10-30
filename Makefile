@@ -287,6 +287,15 @@ test-experimental-e2e: COVERAGE_NAME := experimental-e2e
 test-experimental-e2e: export MANIFEST := $(EXPERIMENTAL_RELEASE_MANIFEST)
 test-experimental-e2e: run-internal image-registry prometheus experimental-e2e e2e e2e-coverage kind-clean #HELP Run experimental e2e test suite on local kind cluster
 
+.PHONY: test-e2e-spec
+test-e2e-spec: SOURCE_MANIFEST := $(STANDARD_E2E_MANIFEST)
+test-e2e-spec: KIND_CLUSTER_NAME := operator-controller-e2e
+test-e2e-spec: GO_BUILD_EXTRA_FLAGS := -cover
+test-e2e-spec: COVERAGE_NAME := e2e
+test-e2e-spec: export MANIFEST := $(STANDARD_RELEASE_MANIFEST)
+test-e2e-spec: run-experimental image-registry
+	uv run behave test/features
+
 .PHONY: prometheus
 prometheus: PROMETHEUS_NAMESPACE := olmv1-system
 prometheus: PROMETHEUS_VERSION := v0.83.0

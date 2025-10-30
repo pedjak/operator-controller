@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {namespace}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {serviceaccount_name}
+  namespace: {namespace}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: olm-admin-clusterrole
+rules:
+  - apiGroups: [olm.operatorframework.io]
+    resources: [clusterextensions, clusterextensions/finalizers]
+    verbs: [update, create, list, watch, get, delete, patch]
+  # Allow ClusterExtensionRevisions to set blockOwnerDeletion ownerReferences
+  - apiGroups: [olm.operatorframework.io]
+    resources: [clusterextensionrevisions, clusterextensionrevisions/finalizers]
+    verbs: [update, create, list, watch, get, delete, patch]
+
+  - apiGroups: [apiextensions.k8s.io]
+    resources: [customresourcedefinitions]
+    verbs: [create, list, watch]
+  - apiGroups: [""]
+    resources:
+      - configmaps
+      - secrets
+      - services
+      - serviceaccounts
+    verbs: [update, create, list, watch, get, delete, patch]
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+    verbs: [ update, create, list, watch, get, delete, patch ]
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+      - networkpolicies
+    verbs: [ update, create, list, watch, get, delete, patch ]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources:
+      - clusterroles
+      - roles
+      - clusterrolebindings
+      - rolebindings
+    verbs: [ update, create, list, watch, get, delete, patch ]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: olm-admin-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: olm-admin-clusterrole
+subjects:
+  - kind: ServiceAccount
+    name: {serviceaccount_name}
+    namespace: {namespace}
