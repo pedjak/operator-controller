@@ -54,7 +54,7 @@ jobs:
         if: matrix.test.use-artifacts == true
         run: |
           curl -sL https://github.com/replicatedhq/troubleshoot/releases/download/${{ env.SUPPORT_BUNDLE_VERSION }}/support-bundle_linux_amd64.tar.gz | tar xz -C /usr/local/bin support-bundle
-          support-bundle version
+          support-bundle --auto-update=false version
 
       - name: Run e2e test
         run: |
@@ -69,7 +69,7 @@ jobs:
         run: |
           if kubectl cluster-info &>/dev/null; then
             mkdir -p /tmp/artifacts
-            support-bundle --interactive=false -o /tmp/artifacts/support-bundle
+            support-bundle --auto-update=false  --interactive=false -o /tmp/artifacts/support-bundle test/e2e/support-bundle.yaml
           else
             echo "No cluster available, skipping support-bundle collection"
           fi
